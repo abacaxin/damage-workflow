@@ -4,15 +4,40 @@ A modular workflow system for Claude Desktop, Claude Code and coding agents, cre
 
 > **Project status: rebuilding from zero.**
 >
-> The repository is being reorganized from the ground up. At this stage, only the `project-discovery` skill is considered part of the new foundation. The remaining workflow, orchestration and implementation skills will be redesigned and added incrementally.
+> The repository is being reorganized from the ground up. At this stage, only the `project-discovery` skill is considered part of the new foundation. The workflow architecture itself is being defined and documented before the remaining skills are implemented.
 
 ## Purpose
 
 DAMAGE Workflow System is intended to provide a structured, auditable development process for software and digital projects.
 
-The long-term vision is to help an agent move through discovery, requirements, scope, planning, design, implementation, validation, security and release without skipping important decisions or inventing project information.
+The long-term vision is to help an agent move through discovery, definition, planning, design, implementation, validation, security and release without skipping important decisions or inventing project information.
 
-The final workflow is not being treated as complete yet. Its phases, skill boundaries and automation rules will be defined and validated during this rebuild.
+The final workflow is not being treated as a simple linear checklist. Its architecture uses a permanent orchestration layer, explicit project state, controlled transitions and adaptive definition loops.
+
+## Core architecture decisions
+
+Two structural decisions are foundational to the rebuild and are documented in `docs/architecture-decisions.md`.
+
+### 1. `workflow-master` is permanently active
+
+`workflow-master` is not a one-time phase. It is the transversal orchestration layer responsible for reading project state, identifying what should happen next, checking blockers and approvals, detecting scope changes and routing the agent to the appropriate specialized skill.
+
+The other skills are specialists. `workflow-master` decides **who should act, when and why**.
+
+The workflow is therefore modeled as a controlled state machine. Returning to an earlier stage is valid when new information, an architectural issue or a scope change requires it.
+
+### 2. Project definition is an adaptive block, not a rigid pipeline
+
+After `project-discovery`, the main definition responsibilities are separated into specialized skills:
+
+- `requirements-definition` — what the product needs to do
+- `scope-definition` — how far the project goes
+- `design-direction` — how the product should present and behave visually
+- `technical-planning` — how the product should be built
+
+These areas are interdependent. They may send questions back to one another when requirements, scope, design or technical decisions conflict or expose new information.
+
+The goal is consistency and completeness of decisions, not artificial linear progress.
 
 ## Current foundation
 
@@ -46,7 +71,7 @@ The skill does not implement the project, define the final technology stack or t
 
 ## Planned direction
 
-The system will eventually be composed of several specialized skills coordinated by a central workflow layer. This structure is planned, not yet implemented.
+The system will eventually be composed of several specialized skills coordinated by the permanent workflow layer. This structure is planned, not yet fully implemented.
 
 Possible future areas include:
 
@@ -122,6 +147,8 @@ damage-workflow/
 ├── LICENSE
 ├── install.sh
 ├── uninstall.sh
+├── docs/
+│   └── architecture-decisions.md
 └── skills/
     └── project-discovery/
         └── SKILL.md
@@ -131,6 +158,9 @@ damage-workflow/
 
 - Build the system incrementally instead of pretending the complete workflow already exists.
 - Keep each skill focused on one responsibility.
+- Keep `workflow-master` as the permanent orchestration layer.
+- Model workflow progression as controlled state transitions, not only a linear checklist.
+- Allow controlled loops between definition areas when new information requires revision.
 - Never invent requirements, decisions or project facts.
 - Separate confirmed information from assumptions, references and recommendations.
 - Do not silently change approved scope.
