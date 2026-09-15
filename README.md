@@ -1,22 +1,87 @@
 # DAMAGE Workflow System
 
-A structured workflow system for Claude Desktop, Claude Code and coding agents, created for DAMAGE.
+A modular workflow system for Claude Desktop, Claude Code and coding agents, created by DAMAGE.
 
-The goal is simple: stop every project from starting with "build this" and instead give the agent a persistent, auditable development process from discovery to maintenance.
+> **Project status: rebuilding from zero.**
+>
+> The repository is being reorganized from the ground up. At this stage, only the `project-discovery` skill is considered part of the new foundation. The remaining workflow, orchestration and implementation skills will be redesigned and added incrementally.
 
-## What it does
+## Purpose
 
-DAMAGE Workflow System organizes projects into explicit phases:
+DAMAGE Workflow System is intended to provide a structured, auditable development process for software and digital projects.
 
-`INIT → DISCOVERY → REQUIREMENTS → SCOPE → COMMERCIAL_APPROVAL → TECHNICAL_PLANNING → DESIGN → DESIGN_APPROVAL → IMPLEMENTATION → VALIDATION → SECURITY_REVIEW → RELEASE → MAINTENANCE`
+The long-term vision is to help an agent move through discovery, requirements, scope, planning, design, implementation, validation, security and release without skipping important decisions or inventing project information.
 
-It uses specialized skills instead of one giant prompt. Project context is persisted inside the repository under `.damage/`, `docs/`, and `tasks/`.
+The final workflow is not being treated as complete yet. Its phases, skill boundaries and automation rules will be defined and validated during this rebuild.
 
-The default mode is **hybrid**: low-risk work can be automated, while important decisions and high-risk operations require human approval.
+## Current foundation
+
+### `project-discovery`
+
+The first active skill conducts an adaptive discovery interview before requirements, scope, design or implementation begin.
+
+It investigates, according to the needs and risk of the project:
+
+- Context, client and responsibilities
+- Problem, motivation and objectives
+- Project type and nature
+- Users and audiences
+- Conceptual scope and boundaries
+- Business rules and operation
+- Content and communication
+- Brand and visual direction
+- User experience and behavior
+- Data, integrations and dependencies
+- Security, privacy and compliance
+- Resources, constraints, budget and schedule
+- Success criteria and approval conditions
+
+Its expected output is:
+
+```text
+docs/01-project-discovery.md
+```
+
+The skill does not implement the project, define the final technology stack or turn assumptions into confirmed decisions.
+
+## Planned direction
+
+The system will eventually be composed of several specialized skills coordinated by a central workflow layer. This structure is planned, not yet implemented.
+
+Possible future areas include:
+
+- Project initialization and state management
+- Requirements definition
+- Scope definition and approval gates
+- Technical planning
+- Visual and interaction planning
+- Implementation support
+- Codebase indexing
+- Validation and testing
+- Security review
+- Release and maintenance
+
+These areas will be rebuilt individually, with clear responsibilities and documented boundaries.
 
 ## Installation
 
-### Recommended
+### Claude Desktop
+
+Download or create a ZIP package containing the skill folder and its `SKILL.md` file. In Claude Desktop, open the Skills/Habilidades management area and use the available upload option.
+
+The expected package structure for the current skill is:
+
+```text
+project-discovery.zip
+└── project-discovery/
+    └── SKILL.md
+```
+
+The exact menu names may vary by Claude Desktop version.
+
+### Claude Code
+
+Clone the repository and run the installer:
 
 ```bash
 git clone https://github.com/abacaxin/damage-workflow.git
@@ -25,113 +90,62 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer copies the skills to:
+The installer copies available skills to:
 
 ```text
 ~/.claude/skills/
 ```
 
-Restart Claude Code after installation if it was already running. For Claude Desktop, use the available Skills/Habilidades installation flow and select the repository or skill package according to the version of Claude Desktop you are using.
-
-### One-line installation
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/abacaxin/damage-workflow/main/install.sh | bash
-```
+Restart Claude Code if it was already running.
 
 ## Usage
 
-Inside a project, start with the discovery skill:
+Inside a project, start with:
 
 ```text
 Execute project-discovery and begin the DAMAGE project discovery interview.
 ```
 
-Or:
+You can also use:
 
 ```text
 Understand this project completely before defining requirements or implementing anything.
 ```
 
-The discovery skill conducts an adaptive conversation about the client, problem, objectives, project type, users, scope, business rules, content, brand, visual direction, experience, data, integrations, security, constraints, resources and success criteria. When the discovery is confirmed, it produces:
+The discovery process should be completed and confirmed before later workflow stages are designed or executed.
+
+## Repository structure
 
 ```text
-docs/01-project-discovery.md
+damage-workflow/
+├── README.md
+├── LICENSE
+├── install.sh
+├── uninstall.sh
+└── skills/
+    └── project-discovery/
+        └── SKILL.md
 ```
 
-The system will create other project-local state as later skills are executed:
+## Development principles
 
-```text
-project-root/
-├── .damage/
-│   ├── config.yaml
-│   └── workflow-lock.md
-├── docs/
-│   ├── 00-project-state.md
-│   ├── 01-project-discovery.md
-│   ├── 02-requirements.md
-│   ├── 03-scope.md
-│   ├── 04-technical-spec.md
-│   ├── 05-visual-spec.md
-│   ├── 06-roadmap.md
-│   ├── 07-decisions.md
-│   ├── 08-code-index.md
-│   ├── 09-security.md
-│   └── 10-change-log.md
-└── tasks/
-    ├── backlog.md
-    ├── active-task.md
-    └── completed.md
-```
-
-## Included skills
-
-| Skill | Purpose |
-|---|---|
-| `workflow-master` | Coordinates the workflow and chooses the next valid action |
-| `init-project` | Initializes a new project structure |
-| `project-discovery` | Conducts the complete adaptive project discovery interview |
-| `project-state` | Maintains the official project state |
-| `requirements-definition` | Converts the discovery into explicit requirements |
-| `scope-definition` | Defines what is in and out of scope |
-| `technical-planning` | Defines architecture, stack, infrastructure, security and testing |
-| `master-prompt` | Produces the implementation master prompt |
-| `codebase-indexer` | Creates a structured index of an existing codebase |
-
-## Updating
-
-If installed from a clone:
-
-```bash
-git pull
-./install.sh
-```
-
-If installed through the one-line installer, run it again after the repository has been updated.
-
-## Uninstall
-
-From the repository:
-
-```bash
-./uninstall.sh
-```
-
-## Design principles
-
-- Never invent requirements.
-- Never silently change approved scope.
-- Separate confirmed decisions from assumptions and proposals.
-- Persist important project context in files, not only chat history.
-- Require human approval for commercial decisions, sensitive access, destructive operations and production releases.
+- Build the system incrementally instead of pretending the complete workflow already exists.
+- Keep each skill focused on one responsibility.
+- Never invent requirements, decisions or project facts.
+- Separate confirmed information from assumptions, references and recommendations.
+- Do not silently change approved scope.
+- Keep important project context persistent and auditable.
+- Require human approval for high-impact or irreversible actions.
 - Do not claim validation without evidence.
-- Keep implementation downstream of discovery, requirements and planning.
+- Keep implementation downstream of discovery and explicit decisions.
 
 ## Status
 
-Current version: `0.1.0`
+Current stage: **foundation rebuild**
 
-This is an early public foundation. The workflow and individual skills can evolve independently through versioned releases.
+Current active skill: `project-discovery`
+
+The version number and release process will be defined after the new architecture and initial skill set have stabilized.
 
 ## License
 
