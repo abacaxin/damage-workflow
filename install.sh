@@ -1,39 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="https://github.com/abacaxin/damage-workflow.git"
-INSTALL_DIR="${HOME}/.damage-workflow"
-SKILLS_DIR="${HOME}/.agents/skills"
+REPO="https://github.com/abacaxin/damage-workflow.git"
+BIN_DIR="${HOME}/.local/bin"
+CLI="${BIN_DIR}/dmg"
+TMP="$(mktemp)"
+trap 'rm -f "${TMP}"' EXIT
 
-install_skills() {
-  mkdir -p "${SKILLS_DIR}"
+mkdir -p "${BIN_DIR}"
+curl -fsSL "${REPO}/raw/main/bin/dmg" -o "${TMP}"
+install -m 755 "${TMP}" "${CLI}"
 
-  if [ -d "${INSTALL_DIR}/.git" ]; then
-    git -C "${INSTALL_DIR}" pull --ff-only
-  else
-    rm -rf "${INSTALL_DIR}"
-    git clone --depth 1 "${REPO_URL}" "${INSTALL_DIR}"
-  fi
-
-  find "${INSTALL_DIR}/skills" -mindepth 2 -maxdepth 2 -type f -name "SKILL.md" -print0 |
-  while IFS= read -r -d '' skill_file; do
-    skill_dir="$(dirname "${skill_file}")"
-    skill_name="$(basename "${skill_dir}")"
-    rm -rf "${SKILLS_DIR}/${skill_name}"
-    cp -R "${skill_dir}" "${SKILLS_DIR}/${skill_name}"
-    echo "  ✓ ${skill_name}"
-  done
-}
-
-case "${1:-install}" in
-  install|update)
-    echo "Installing/updating DAMAGE Workflow skills..."
-    install_skills
-    echo "Done. Skills installed in ${SKILLS_DIR}."
-    ;;
+case ":${PATH}:" in
+  *:"${BIN_DIR}":*) ;;
   *)
-    echo "Usage: dmg install"
-    echo "       dmg update"
-    exit 1
+    echo ""
+    echo "DAMAGE CLI installed at ${CLI}"
+    echo "Add ${BIN_DIR} to PATH to use 'dmg':"
+    echo "  export PATH="${BIN_DIR}:$PATH""
+    echo ""
     ;;
 esac
+
+"${CLI}" version

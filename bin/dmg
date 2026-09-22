@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DAMAGE_VERSION="0.1.0"
+DAMAGE_REPO="https://github.com/abacaxin/damage-workflow.git"
+DAMAGE_DIR="${HOME}/.damage-workflow"
+DAMAGE_SKILLS_DIR="${HOME}/.agents/skills"
+
+die() { echo "dmg: $*" >&2; exit 1; }
+info() { echo "dmg: $*"; }
+
+usage() {
+  cat <<'EOF'
+DAMAGE Workflow CLI
+
+Usage:
+  dmg <command>
+
+Commands:
+  install     Install all DAMAGE Workflow skills
+  update      Update the repository and reinstall all skills
+  list        List installed DAMAGE Workflow skills
+  doctor      Check the local DAMAGE/Codex installation
+  version     Show the CLI version
+  help        Show this help
+  uninstall   Remove installed DAMAGE Workflow files
+
+Examples:
+  dmg install
+  dmg update
+  dmg list
+  dmg doctor
+EOF
+}
+
+ensure_repo() {
+  if [ -d "${DAMAGE_DIR}/.git" ]; then
+    git -C "${DAMAGE_DIR}" pull --ff-only >/dev/null
+  else
+    rm -rf "${DAMAGE_DIR}"
+    git clone --depth 1 "${DAMAGE_REPO}" "${DAMAGE_DIR}" >/dev/null
+  fi
+}
+
+install_skills() {
+  ensure_repo
+  mkdir -p "${DAMAGE_SKILLS_DIR}"
+
+  local count=0
+  while IFS= read -r -d '' skill_file; do
+    local skill_dir skill_name target
+    skill_dir="$(dirname "${skill_file}")"
+    skill_name="$(basename "${skill_dir}")"
+    target="${DAMAGE_SKILLS_DIR}/${skill_name}"
+
+    rm -rf "${target}"
+    cp -R "${skill_dir}" "${target}"
+    echo "  ✓ ${skill_name}"
+    count=$((count + 1))
+  done < <(find "${DAMAGE_DIR}/skills" -mindepth 2 -maxdepth 2 -type f -name "SKILL.md" -print0)
+
+  [ "${count}" -gt 0 ] || die "no skills found in repository"
+  info "${count} skill(s) installed in ${DAMAGE_SKILLS_DIR}"
+}
+
+list_skills() {
+  if [ ! -d "${DAMAGE_SKILLS_DIR}" ]; then
+    info "No DAMAGE Workflow skills installed."
+    exit 0
+  fi
+
+  local found=0
+  while IFS= read -r -d '' skill; do
+    echo "  ✓ $(basename "${skill}")"
+    found=1
+  done < <(find "${DAMAGE_SKILLS_DIR}" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
+
+  [ "${found}" -eq 1 ] || info "No skills installed."
+}
+
+doctor() {
+  local failed=0
+  echo "DAMAGE Workflow doctor"
+  echo ""
+
+  if command -v git >/dev/null 2>&1; then
+    echo "  ✓ git: $(git --version | head -n1)"
+  else
+    echo "  ✗ git: not found"
+    failed=1
+  fi
+
+  if [ -d "${DAMAGE_DIR}/.git" ]; then
+    echo "  ✓ repository: ${DAMAGE_DIR}"
+  else
+    echo "  ! repository: not installed"
+  fi
+
+  if [ -d "${DAMAGE_SKILLS_DIR}" ]; then
+    echo "  ✓ skills directory: ${DAMAGE_SKILLS_DIR}"
+  else
+    echo "  ! skills directory: not found"
+  fi
+
+  if command -v codex >/dev/null 2>&1; then
+    echo "  ✓ codex: available"
+  else
+    echo "  ! codex: not found in PATH"
+  fi
+
+  echo ""
+  [ "${failed}" -eq 0 ] || exit "${failed}"
+}
+
+uninstall() {
+  rm -rf "${DAMAGE_DIR}"
+  if [ -d "${DAMAGE_SKILLS_DIR}" ]; then
+    while IFS= read -r -d '' skill; do
+      name="$(basename "${skill}")"
+      case "${name}" in
+        workflow-master|init-project|project-discovery|project-state|requirements-definition|scope-definition|commercial-approval|technical-planning|design-direction|ux-ui-design|design-approval|master-prompt|codebase-indexer|implementation-planning|implementation|validation|security-review|release-preparation|release-deploy|documentation|maintenance|change-management)
+          rm -rf "${skill}"
+          ;;
+      esac
+    done < <(find "${DAMAGE_SKILLS_DIR}" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null || true)
+  fi
+  info "DAMAGE Workflow removed."
+}
+
+case "${1:-help}" in
+  install) install_skills ;;
+  update) info "Updating DAMAGE Workflow..."; install_skills ;;
+  list) list_skills ;;
+  doctor) doctor ;;
+  version|--version|-v) echo "dmg ${DAMAGE_VERSION}" ;;
+  help|--help|-h) usage ;;
+  uninstall) uninstall ;;
+  *) usage; exit 1 ;;
+esac
