@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="https://github.com/abacaxin/damage-workflow.git"
+BASE_URL="https://raw.githubusercontent.com/abacaxin/damage-workflow/main"
 BIN_DIR="${HOME}/.local/bin"
 CLI="${BIN_DIR}/dmg"
 TMP="$(mktemp)"
 trap 'rm -f "${TMP}"' EXIT
 
 mkdir -p "${BIN_DIR}"
-curl -fsSL "${REPO}/raw/main/bin/dmg" -o "${TMP}"
+curl -fsSL "${BASE_URL}/bin/dmg" -o "${TMP}"
 install -m 755 "${TMP}" "${CLI}"
 
 case ":${PATH}:" in
