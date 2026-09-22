@@ -1,3 +1,8 @@
+---
+name: prompt-master
+description: Consolida discovery, requisitos, escopo, aprovação comercial, planejamento técnico, UX/UI, arquitetura, segurança e documentação em uma especificação mestre de execução rastreável. Inspeciona o repositório, detecta conflitos e gera o Master Prompt sem inventar requisitos ou expandir escopo. Use antes da execução por uma IA ou desenvolvedor.
+---
+
 # Prompt Master
 
 ## Purpose
