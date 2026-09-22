@@ -2,9 +2,7 @@
 
 A modular workflow system for Claude Desktop, Claude Code and coding agents, created by DAMAGE.
 
-> **Project status: rebuilding from zero.**
->
-> The repository is being reorganized from the ground up. At this stage, only the `project-discovery` skill is considered part of the new foundation. The workflow architecture itself is being defined and documented before the remaining skills are implemented.
+The repository is being rebuilt incrementally as a modular workflow system. The permanent `workflow-master`, `project-discovery`, `requirements-definition`, `design-direction` and `ux-ui-design` skills are now part of the active foundation.
 
 ## Purpose
 
@@ -41,9 +39,15 @@ The goal is consistency and completeness of decisions, not artificial linear pro
 
 ## Current foundation
 
+### `workflow-master`
+
+The permanent orchestration layer controls the workflow from project initialization through maintenance. Project initialization is part of `workflow-master`; there is no separate startup skill.
+
+It reads project state, routes work to specialist skills, controls transitions and approvals, detects changes, and maintains workflow integrity.
+
 ### `project-discovery`
 
-The first active skill conducts an adaptive discovery interview before requirements, scope, design or implementation begin.
+The discovery skill conducts an adaptive discovery interview before detailed definition and implementation.
 
 It investigates, according to the needs and risk of the project:
 
@@ -69,11 +73,19 @@ docs/01-project-discovery.md
 
 The skill does not implement the project, define the final technology stack or turn assumptions into confirmed decisions.
 
-## Planned direction
+## Current and planned direction
 
-The system will eventually be composed of several specialized skills coordinated by the permanent workflow layer. This structure is planned, not yet fully implemented.
+The system is composed of specialized skills coordinated by the permanent workflow layer. The active foundation is being expanded incrementally.
 
-Possible future areas include:
+Current skills include:
+
+- `workflow-master`
+- `project-discovery`
+- `requirements-definition`
+- `design-direction`
+- `ux-ui-design`
+
+Future areas include:
 
 - Project initialization and state management
 - Requirements definition
@@ -115,29 +127,27 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer copies available skills to:
-
-```text
-~/.claude/skills/
-```
+The installer copies available skills to the configured skills directory used by the target coding agent.
 
 Restart Claude Code if it was already running.
 
 ## Usage
 
-Inside a project, start with:
+Inside a project, invoke the workflow master first:
 
 ```text
-Execute project-discovery and begin the DAMAGE project discovery interview.
+Start the DAMAGE Workflow for this project and determine the current state and next action.
 ```
 
-You can also use:
+For a new or insufficiently understood project, `workflow-master` initializes the DAMAGE state and routes to `project-discovery`.
+
+You can also explicitly invoke a specialist when appropriate, for example:
 
 ```text
-Understand this project completely before defining requirements or implementing anything.
+Execute ux-ui-design for the current project.
 ```
 
-The discovery process should be completed and confirmed before later workflow stages are designed or executed.
+Specialist execution remains subject to the project's state, dependencies and approvals.
 
 ## Repository structure
 
@@ -173,7 +183,7 @@ damage-workflow/
 
 Current stage: **foundation rebuild**
 
-Current active skill: `project-discovery`
+Current foundation includes `workflow-master`, `project-discovery`, `requirements-definition`, `design-direction` and `ux-ui-design`.
 
 The version number and release process will be defined after the new architecture and initial skill set have stabilized.
 
