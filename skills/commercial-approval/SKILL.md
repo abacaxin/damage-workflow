@@ -1,3 +1,8 @@
+---
+name: commercial-approval
+description: Transforma o escopo definido em uma aprovação comercial explícita antes do planejamento técnico. Registra entregáveis, fora do escopo, prazo, investimento, custos recorrentes, dependências, responsabilidades, política de mudanças, pendências, riscos e status de aprovação. Use após requisitos/escopo e antes de technical-planning ou execução.
+---
+
 # Commercial Approval
 
 ## Purpose
